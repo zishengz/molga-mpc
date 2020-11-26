@@ -1,5 +1,6 @@
 # molGA-mpc
 Molecular Genetic Algorithm for Metal Phthalocyanine
+
 Copyright © 2020 Zisheng Zhang
 
 # Dependencies
