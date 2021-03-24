@@ -10,5 +10,3 @@ Copyright © 2020 Zisheng Zhang
 - pyTorch
 
 
-
-P.S. Most of the codes are written in my UG, containing very messy scripts... Will clear up and modularize them someday.
