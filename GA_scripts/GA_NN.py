@@ -322,9 +322,15 @@ def parCalc(genePop, par=4):
             gene2str(genePop[i]),results[i]))
     f.close()
 
-#nprocs = mp.cpu_count()
+# # Use all available CPUs
+# nprocs = mp.cpu_count()
+
+# Set the number of CPUs to use
 nprocs = 4
+# Set the population size, mutation rate
+# and number of genes to change per mutation
 popSize, mutRate, numMut = 200, 0.33, 1
+# Set the initial gene template
 template=str2gene('0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0')
 
 

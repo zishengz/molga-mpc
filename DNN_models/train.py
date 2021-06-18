@@ -15,10 +15,12 @@ import torch.optim as optim
 import torch.nn as nn
 from torch.autograd import Variable
 
+# For GPU, change accordingly
 torch.set_num_threads(2)
 print('Running on %i threads!'%torch.get_num_threads())
 
 def encode(geneLst):
+    '''One-hot encoder: from a gene representation to a vector'''
     vec = []
     for i in geneLst[:8]:
         tmp = [0 for i in range(42)]
@@ -27,15 +29,16 @@ def encode(geneLst):
     return vec
 
 def getEquiv(geneLst):
+    '''Rotate the molecule and include the rotated equivalent representations'''
     shiftRight = lambda lst: [lst[-2]] + lst[:-2]
     eqSet = []
-#    for i in [geneLst, list(reversed(geneLst))]:
     for i in [geneLst]:
         for j in range(4):
             eqSet.append(shiftRight(i))
     return eqSet
 
 def dataAug(dataSet):
+    '''Call the equivalent representation generator to augment the dataset'''
     augSet = []
     for g in dataSet:
         for e in getEquiv(g[0]):
@@ -45,6 +48,7 @@ def dataAug(dataSet):
     return augSet
 
 def curate(Xdata, Ydata):
+    '''Romove bad data points'''
     Xtmp, Ytmp = [], []
     for i in range(len(Xdata)):
         if -10 < Ydata[i] < 10:
@@ -68,7 +72,9 @@ Y = np.array([l[8] for l in data])
 X, Y = curate(X, Y)
 
 ymax, ymin = Y.max(), Y.min()
-#Y = (Y - ymin) / (ymax - ymin)
+
+# # Uncomment to enable normalization
+# Y = (Y - ymin) / (ymax - ymin)
 
 print(' > Training set size: %i\n > Representation dimension: %i'%(len(X), len(X[0])))
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
@@ -103,9 +109,11 @@ learning_rate = 0.01
 loss_func = torch.nn.MSELoss(reduction='sum')
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
+# # Uncomment to enable SGD as optimizer
 # loss_func = torch.nn.MSELoss()
 # optimizer = torch.optim.SGD(neu.parameters(), lr = 0.01)
 
+# Train for 100 epoches
 for epoch in range(100):
     x, y = shuffle(X_train, Y_train)
     for start in range(0, len(x), batch_size):
@@ -129,6 +137,7 @@ for epoch in range(100):
         print('Converge!')
         break
 
+# Plot the validation results
 Y_pred = model(Variable(torch.tensor(X_test.astype(np.float32))))
 print('R square on test set: %.6f'%\
     r2_score(Y_pred.detach().numpy(), Y_test))
@@ -143,4 +152,6 @@ plt.margins(0,0)
 plt.savefig('Model_validation')
 
 torch.save(model, 'model.pkl')
+
+# # Model loader
 #model = torch.load('model.pkl')
